@@ -1,0 +1,21 @@
+{
+    "manifest_version": 2,
+    "name": "block",
+    "description": "gh",
+    "version": "1.0.0",
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+    "background": {
+        "persistent": true,
+        "scripts": ["js/bg.js"]
+    },
+    "browser_action": {
+        "default_icon": "images/icon128.png",
+        "default_popup": "index.html"
+    },
+    "icons": {
+        "128": "images/icon128.png"
+    },
+    "permissions": [
+        "webRequest", "webRequestBlocking", "<all_urls>", "storage", "tabs", "storage", "activeTab"
+    ]
+}

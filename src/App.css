@@ -1,0 +1,194 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+body {
+  font-family: 'Roboto',sans-serif;
+  width: 500px;
+  letter-spacing: 1px;
+}
+/*
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}*/
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.log-page, .register-page {
+  color: #fff;
+  background-color: #4b5158;
+  padding: 20px 30px;
+  text-align: center;
+}
+.login-button, .fee-but button, .create-button {
+  background: #049cce;
+  color: #fff;
+  transition: all .3s ease 0s!important;
+  border: 1px solid transparent;
+  vertical-align: middle;
+  font-weight: 400;
+  font-style: normal;
+  text-transform: uppercase;
+  width: 60%;
+  height: 25px;
+  display: block;
+  margin: auto;
+  margin-top: 20px;
+  cursor: pointer;
+  border-radius: 2px!important;
+  outline:none!important;
+}
+.login-button:hover, .fee-but button:hover {
+    background-color: #04abe2!important;
+}
+.name-lable {
+  text-transform: uppercase;
+}
+.log-page input, .main-page input, .register-page input {
+    background-color: #2d2d2d;
+    border: 0;
+    color: #fff;
+    font-size: 14.4px!important;
+    height: 2.4rem;
+    border-radius: 3px!important;
+    padding: 0;
+    padding-left: .5rem;
+    text-transform: lowercase;
+    font-variant: initial;
+    width: 98%;
+    outline:none!important;
+}
+.login-page-data {
+  padding-top: 10px;
+  text-align: left;
+  width: 80%;
+  margin: auto;
+}
+.login-page-data p {
+    font-size: 13px;
+    margin-bottom: 10px;
+    padding-left: 7px;
+    letter-spacing: 0.4px;
+}
+.login-error-acc {
+    height: 20px;
+    color: #ff3950!important;
+    padding-top: 10px;
+    padding-left: 7px;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+.main-page {
+  color: #fff;
+  background-color: #4b5158;
+  padding: 20px 70px;
+}
+.main-page h2 {
+  letter-spacing: 1.2px;
+  font-size: 28px;
+}
+.main-page-data p {
+  font-size: 14px;
+}
+/*.fee-but {
+  width: 102%;
+}*/
+.fee-but > div {
+  width: 70%;
+  display: inline-block;
+}
+.fee-but > button {
+  width: 25%;
+  display: inline-block;
+  height: 40px;
+  font-weight: 600;
+  margin-top: 0px;
+  margin-left: 18px;
+}
+.main-page-data textarea {
+    background-color: #2d2d2d;
+    border: 0;
+    color: #fff;
+    font-size: 14.4px!important;
+    border-radius: 3px!important;
+    padding: 7px;
+    text-transform: lowercase;
+    font-variant: initial;
+    width: 96%;
+    outline: none!important;
+    resize:none;
+}
+.confirm-checks label {
+    position: relative;
+    display: block;
+    font-size: .9rem;
+}
+.confirm-checks.first {
+  margin-top: 20px;
+}
+.confirm-checks label input {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    top: 0;
+    left: 0px;
+}
+.confirm-checks div {
+    display: inline-block;
+    padding-left: 30px;
+    margin: 0;
+}
+.create-button {
+  margin-top: 10px;
+}
+.buttonCopy {
+    background: #049cce;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+    border-radius: 0;
+    transition: all .3s ease 0s!important;
+    border: 1px solid transparent;
+    display: inline-block;
+    width: 50px;
+    height: 40px;
+    margin-left: 12px;
+    border-radius: 3px;
+    vertical-align: middle;
+    outline: none!important;
+    cursor: pointer;
+}
+.svg-icon {
+    width: 20px;
+    height: 20px;
+}
+#generatedPassword {
+  width: 80%;
+  text-transform: none!important;
+}
+#confirmedPassword {
+  text-transform: none!important;
+}
+.spanRight {
+  float: right;
+}
