@@ -255,14 +255,14 @@ class Main extends Component {
                               memoToKey,
                               nonce,
                               memo
-                          ).toString("utf-8")
+                          )
                       }
-                      console.log(Aes.encrypt_with_checksum(
-                              pKey,
-                              memoToKey,
-                              nonce,
-                              memo
-                          ).toString("utf-8"));
+                      // console.log(Aes.encrypt_with_checksum(
+                      //         pKey,
+                      //         memoToKey,
+                      //         nonce,
+                      //         memo
+                      //     ).toString("utf-8"));
                       let tr = new TransactionBuilder()
 
                       tr.add_type_operation( "transfer", {
