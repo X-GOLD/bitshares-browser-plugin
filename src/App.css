@@ -30,11 +30,45 @@ body {
   font-size: large;
 }*/
 
+
+
+/* KEYFRAMES */
+@keyframes tooltips-vert {
+  to {
+    opacity: .9;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes tooltips-horz {
+  to {
+    opacity: .9;
+    transform: translate(0, -50%);
+  }
+}
+
+/* FX All The Things */ 
+[tooltip]:not([flow]):hover::before,
+[tooltip]:not([flow]):hover::after,
+[tooltip][flow^="up"]:hover::before,
+[tooltip][flow^="up"]:hover::after,
+[tooltip][flow^="down"]:hover::before,
+[tooltip][flow^="down"]:hover::after {
+  animation: tooltips-vert 300ms ease-out forwards;
+}
+
+[tooltip][flow^="left"]:hover::before,
+[tooltip][flow^="left"]:hover::after,
+[tooltip][flow^="right"]:hover::before,
+[tooltip][flow^="right"]:hover::after {
+  animation: tooltips-horz 300ms ease-out forwards;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-.log-page, .register-page {
+.log-page, .register-page, .modal-page {
   color: #fff;
   background-color: #4b5158;
   padding: 20px 30px;
@@ -78,7 +112,7 @@ body {
     width: 98%;
     outline:none!important;
 }
-.login-page-data {
+.login-page-data, .acc-creation-page-data {
   padding-top: 10px;
   text-align: left;
   width: 80%;
@@ -191,4 +225,90 @@ body {
 }
 .spanRight {
   float: right;
+}
+.positionSymbol {
+  display: inline-block;
+}
+span.positionSymbol {
+  width: 15px;
+  margin-left: 5px;
+  vertical-align: sub;
+}
+span.positionSymbol path {
+  fill: #fff;
+}
+.__react_component_tooltip {
+  width: 270px;
+  font-size: 12px;
+  background-color: #767679 !important;
+}
+.__react_component_tooltip.type-dark.place-top:after {
+  border-top-color: #767679 !important;
+}
+div.divider {
+  margin: 20px 0;
+  border-bottom: 1px solid hsla(0,0%,50%,.45);
+}
+.acc-creation-page-data p {
+  word-wrap: break-word;
+  text-align: left;
+}
+.acc-creation-page-data p.warning {
+  color: #fcab53;
+}
+.showP, .showP p {
+  text-align: center;
+}
+.ReactModalPortal > div {
+  background: rgba(51,51,51,.7)!important;
+}
+.ReactModalPortal > div > div {
+  background: #4b5158!important;
+  border: none!important;
+}
+
+.table>tbody>tr:nth-of-type(2n) {
+  background-color: #343434;
+}
+/*rgb(118, 118, 121)*/
+.modal-page-data {
+  width: 100%;
+  margin: auto;
+  margin-top: 30px;
+}
+.modal-page-data table{
+    width: 100%;
+    text-align: left;
+}
+.txtlabel.success {
+  color: #7bd500;
+  text-transform: uppercase;
+  font-weight: 400;
+  font-style: normal;
+}
+.table td {
+  padding: 5px;
+  max-width: 210px;
+}
+.table {
+  font-size: .875rem;
+  word-wrap: break-word;
+}
+.button-group {
+  margin-top: 10px;
+}
+.button-group button {
+  width: 40%;
+  display: inline-block;
+  margin-right: 10px; 
+  height: 35px;
+}
+.button.hollow.primary {
+  border-color: #049cce;
+  color: #049cce!important;
+  background: transparent;
+}
+.button.hollow.primary:hover {
+  color: #fff!important;
+  background-color: #04abe2!important;
 }
