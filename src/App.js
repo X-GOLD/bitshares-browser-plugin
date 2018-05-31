@@ -17,7 +17,7 @@ import './App.css';
 import {Apis} from "bitsharesjs-ws";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import ReactTooltip from 'react-tooltip'
-
+//var numeral = require('numeral');
 var bitsharesjs = require("bitsharesjs");
 var Login = bitsharesjs.Login;
 var PrivateKey = bitsharesjs.PrivateKey;
@@ -27,7 +27,6 @@ var keyUtils = bitsharesjs.key;
 var TransactionHelper = bitsharesjs.TransactionHelper;
 var Aes = bitsharesjs.Aes;
 var TransactionBuilder = bitsharesjs.TransactionBuilder;
-
 // var server = "wss://bitshares.openledger.info/ws";
 // var nameCurrency = 'BTS';
 // var urlRegister = 'https://faucet.bitshares.eu/api/v1/accounts';
@@ -58,6 +57,7 @@ class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
+        modalStatusIsOpen: false,
         modalIsOpen: false,
         currencyNoformat: false,
         currency: false,
@@ -66,8 +66,11 @@ class Main extends Component {
         modalTo: false,
         modalQuantity: false,
         modalMessage: false,
-        modalFee: false
+        modalFee: false,
+        modalFeeShow: false
     };
+    // this.openModalStatus = this.openModalStatus.bind(this);
+    // this.closeModalStatus = this.closeModalStatus.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
   }
@@ -80,6 +83,8 @@ class Main extends Component {
     else {
       var accName = 'fdfdgffdg';
       var accPass = 'P5JtLaTvJzVKqFeE3hkV1VTJ3muw8U6RP6F8r1zdKBaza';
+      // var accName = 'sdf-werg';
+      // var accPass = 'P5JrEh78993Rp97AsvB5CwNR7tiEzKeb2DXxydjJDbVw3E';
     }
     var private_key = PrivateKey.fromSeed( accName + 'owner' + accPass );
     let pKey = private_key;
@@ -94,7 +99,11 @@ class Main extends Component {
             Apis.instance().db_api().exec( "get_account_balances", [ idAcc[0][0], [idVal[0].id] ] )
                 .then( balance_objects => {
                   var amountBalance = balance_objects[0].amount;
-                  var amountBalanceFormat = amountBalance.slice(0, amountBalance.length-5) + "." + amountBalance.slice(amountBalance.length-5);
+                  console.log(amountBalance);
+                  var amountBalanceFormat = this.formatInp(amountBalance);
+                  console.log(amountBalanceFormat);
+                  //var amountBalanceFormat = numeral(amountBalance).format('0.00000');
+
                   amountBalanceFormat = this.styleBalance(amountBalanceFormat);
                   var amountID = balance_objects[0].asset_id;
                   _this.setState({
@@ -118,6 +127,30 @@ class Main extends Component {
 
     return s2;
   }
+  formatInp(s) {
+    var s = s.toString();
+    var num;
+    console.log(s.length);
+    if (s.length == 1) {
+      num = '0.0000' + s;
+    }
+    else if (s.length == 2) {
+      num = '0.000' + s;
+    }
+    else if (s.length == 3) {
+      num = '0.00' + s;
+    }
+    else if (s.length == 4) {
+      num = '0.0' + s;
+    }
+    else if (s.length == 5) {
+      num = '0.' + s;
+    }
+    else {
+      num = s.slice(0, -5) + "." + s.slice(-5);
+    }
+    return num;
+  }
   openModal() {
     this.setState({modalIsOpen: true});
   }
@@ -125,7 +158,21 @@ class Main extends Component {
   closeModal() {
     this.setState({modalIsOpen: false});
   }
+  // openModalStatus() {
+  //   this.setState({modalStatusIsOpen: true});
+  // }
 
+  // closeModalStatus() {
+  //   this.setState({modalStatusIsOpen: false});
+  // }
+/*
+<div className="fee-but">
+                <div>
+                  <p className="name-lable">fee</p>
+                  <input type="text" disabled id="fee" />
+                </div>
+                <button onClick={this.validate}>Send</button>
+              </div>*/
   render() {
     return (
         <div className="main-page">
@@ -138,17 +185,11 @@ class Main extends Component {
               <p className="name-lable">To</p>
               <input type="text" id="toUser" />
               <p className="name-lable"><span>Quantity</span><span className="spanRight">Available: {this.state.currency} {nameCurrency}</span></p>
-              <input type="text" id="quantity" />
+              <input type="text" id="quantity" onBlur={this.validateCurrency}  onFocus={this.validateCurrency} onKeyUp={this.validateCurrency} />
               <p className="name-lable">Memo/Message</p>
               <textarea id="memoText" rows="3" />
               <div className="login-error-acc"></div>
-              <div className="fee-but">
-                <div>
-                  <p className="name-lable">fee</p>
-                  <input type="text" disabled id="fee" />
-                </div>
-                <button onClick={this.validate}>Send</button>
-              </div>
+              <button className="create-button" onClick={this.validate}>Send</button>
             </div>
             <Modal
               isOpen={this.state.modalIsOpen}
@@ -167,15 +208,26 @@ class Main extends Component {
                   <td></td></tr><tr><td>
                   <span>From</span></td><td>{this.state.modalFrom}</td></tr>
                   <tr><td><span>To</span></td><td>{this.state.modalTo}</td></tr>
-                  <tr><td><span>Quantity</span></td><td><span className=""><span>{this.state.modalQuantity}.00000 </span><span className="currency">{nameCurrency}</span></span></td></tr>
+                  <tr><td><span>Quantity</span></td><td><span className=""><span>{this.state.modalQuantity}</span><span className="currency">{nameCurrency}</span></span></td></tr>
                   <tr><td><span>Message</span></td><td className="memo">{this.state.modalMessage}</td></tr>
-                  <tr><td><span>Fee</span></td><td><span className="facolor-fee"><span>{this.state.modalFee} </span><span className="currency">{nameCurrency}</span></span></td></tr>
+                  <tr><td><span>Fee</span></td><td><span className="facolor-fee"><span>{this.state.modalFeeShow} </span><span className="currency">{nameCurrency}</span></span></td></tr>
                 </tbody>
                 </table>
                 <div className="button-group">
                   <button className="create-button" onClick={this.transfer}>Confirm</button>
                   <button className="create-button button hollow primary" onClick={this.closeModal}>close</button>
                 </div>
+              </div>
+              </div>
+            </Modal>
+            <Modal overlayClassName="trOverlayModal" className="trModal"
+              isOpen={this.state.modalStatusIsOpen}
+              onRequestClose={this.closeModalStatus}>
+              <div className="modal-page status">
+              <div className="modal-page-data status">
+                <p>Transaction confirmed<span className="icon checkmark-circle icon-1x success positionSymbol"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 28"><title>check-circle</title><path d="M20.062 11.469c0-.266-.094-.531-.281-.719l-1.422-1.406c-.187-.187-.438-.297-.703-.297s-.516.109-.703.297l-6.375 6.359-3.531-3.531c-.187-.187-.438-.297-.703-.297s-.516.109-.703.297l-1.422 1.406c-.187.187-.281.453-.281.719s.094.516.281.703l5.656 5.656c.187.187.453.297.703.297.266 0 .531-.109.719-.297l8.484-8.484a.981.981 0 0 0 .281-.703zM24 14c0 6.625-5.375 12-12 12S0 20.625 0 14 5.375 2 12 2s12 5.375 12 12z"></path></svg></span></p> 
+                <p>{this.state.modalFrom} sent {this.state.modalQuantity} {nameCurrency} to {this.state.modalTo} </p>
+                <button className="create-button" onClick={this.status}>Ok, let's go</button>
               </div>
               </div>
             </Modal>
@@ -187,7 +239,24 @@ class Main extends Component {
 
 //new modal             overlayClassName="dqqqqq"
                    // className="aaa"
+  validateCurrency = (e) => {
+    var str = e.target.value,
+    reg = /[\d\.]/,
+    str = str.replace(",", ".").replace(/^\./, "0.").replace(/^0(\d)/, "$1"),
+    len = 30 < str.length ? 30 : str.length,
+    b = 0;
+    for (; b < len && reg.test(str.charAt(b)); b++) "." == str.charAt(b) && (reg = /\d/, len = b + 6);
+    e.type == "blur" && (str = str.replace(/\.$/, ""))
+    document.querySelector("#quantity").value = str.slice(0, b)
+
+  }
+  status = (e) => {
+    this.setState({modalStatusIsOpen: false});
+    history.go("/main");
+  }
   transfer = (e) => {
+     //this.setState({modalStatusIsOpen: true, modalIsOpen: false}); 
+
     if (dataKey) {
       var accName = dataKey.saveAccName;
       var accPass = dataKey.savePass;
@@ -202,17 +271,8 @@ class Main extends Component {
               var transfFrom = this.state.modalFrom;
               var transfTo = this.state.modalTo;
               var transfText = this.state.modalMessage;
+              var transfFee = this.state.modalFee;
 
-              // Promise.all([
-              //       Apis.instance().db_api().exec("get_key_references", [[pKey.toPublicKey().toPublicKeyString()]]),
-              //       Apis.instance().db_api().exec("lookup_asset_symbols", [[nameCurrency]]),
-              //   ]).then(res => {
-              //     let [idAcc, idVal] = res;
-              //     Apis.instance().db_api().exec( "get_account_balances", [ idAcc[0][0], [idVal[0].id] ] )
-              //         .then( balance_objects => {
-              //           console.log(balance_objects);
-              //       });   
-              //   });
               let fromAccount = transfFrom;
               let memoSender = fromAccount;
               let memo = transfText;
@@ -230,11 +290,9 @@ class Main extends Component {
                       FetchChain("getAsset", sendAmount.asset),
                       FetchChain("getAsset", sendAmount.asset)
                   ]).then((res)=> {
-                       console.log("got data:", res);
                        
                       let [fromAccount, toAccount, memoSender, sendAsset, feeAsset] = res;
 
-                      // Memos are optional, but if you have one you need to encrypt it here
                       let memoFromKey = memoSender.getIn(["options","memo_key"]);
                       console.log("memo pub key:", memoFromKey);
                       let memoToKey = toAccount.getIn(["options","memo_key"]);
@@ -255,7 +313,7 @@ class Main extends Component {
 
                       tr.add_type_operation( "transfer", {
                           fee: {
-                              amount: 100,
+                              amount: transfFee,
                               asset_id: feeAsset.get("id")
                           },
                           from: fromAccount.get("id"),
@@ -263,11 +321,19 @@ class Main extends Component {
                           amount: { amount: sendAmount.amount, asset_id: sendAsset.get("id") },
                           memo: memo_object
                       } )
-
                       tr.set_required_fees().then(() => {
                           tr.add_signer(pKey, pKey.toPublicKey().toPublicKeyString());
                           console.log("serialized transaction:", tr.serialize());
-                          tr.serialize();
+                          var status = tr.serialize();
+                          if (status.operations) {
+                            this.setState({modalStatusIsOpen: true, modalIsOpen: false}); 
+                          }
+                          else {
+                            this.setState({modalIsOpen: false});
+                            document.querySelector('.login-error-acc').innerHTML = status.message;
+
+                          }
+                          //status.code, status.message
                           tr.broadcast();
                       })
                   });
@@ -299,10 +365,10 @@ class Main extends Component {
               if (transfFrom.length == 0) {
                 document.querySelector('.login-error-acc').innerHTML = "Please write name account from";
               }
-              else if (isNaN(parseFloat(transfCurrency)) || !isFinite(transfCurrency)) {
+              else if (isNaN(parseFloat(transfCurrency)) ) {
                 document.querySelector('.login-error-acc').innerHTML = "Currency must be only numbers";
               }
-              else if (parseInt(this.state.currencyNoformat.slice(0, this.state.currencyNoformat.length-5)) < transfCurrency) {
+              else if (transfCurrency > this.state.currency - 0.001 && transfCurrency > 0) {
                 document.querySelector('.login-error-acc').innerHTML = "You don't have that amount of currency";
               }
               else if (accName != transfFrom) {
@@ -317,17 +383,71 @@ class Main extends Component {
               else if (transfText.length == 0) {
                 document.querySelector(".login-error-acc").innerHTML = "Please, write message";
               }
+              else if (transfText.length > 150) {
+                document.querySelector(".login-error-acc").innerHTML = "Soo longer message";
+              }
               else {
-                this.setState({modalIsOpen: true,
-                  modalFrom: transfFrom,
-                  modalTo: transfTo,
-                  modalQuantity: transfCurrency,
-                  modalMessage: transfText,
-                  modalFee: 0.001});                      
+                let fromAccount = transfFrom;
+                let memoSender = fromAccount;
+                let memo = transfText;
+
+                let toAccount = transfTo;
+
+                let sendAmount = {
+                    amount: transfCurrency * 100000,
+                    asset: nameCurrency
                 }
-            });
-               
-          
+                Promise.all([
+                      FetchChain("getAccount", fromAccount),
+                      FetchChain("getAccount", toAccount),
+                      FetchChain("getAccount", memoSender),
+                      FetchChain("getAsset", sendAmount.asset),
+                      FetchChain("getAsset", sendAmount.asset)
+                  ]).then((res)=> {
+                       
+                      let [fromAccount, toAccount, memoSender, sendAsset, feeAsset] = res;
+
+                      let memoFromKey = memoSender.getIn(["options","memo_key"]);
+
+                      let memoToKey = toAccount.getIn(["options","memo_key"]);
+                      let nonce = TransactionHelper.unique_nonce_uint64();
+
+                      let memo_object = {
+                          from: memoFromKey,
+                          to: memoToKey,
+                          nonce,
+                          message: Aes.encrypt_with_checksum(
+                              pKey,
+                              memoToKey,
+                              nonce,
+                              memo
+                          )
+                      }
+                      Apis.instance().db_api().exec("get_required_fees", [
+                          [[1,{
+                          fee: {
+                              amount: 0,
+                              asset_id: feeAsset.get("id")
+                          },
+                          from: fromAccount.get("id"),
+                          to: toAccount.get("id"),
+                          amount: { amount: sendAmount.amount, asset_id: sendAsset.get("id") },
+                          memo: memo_object
+                        }]],"1.3.0"
+                      ]).then( data => {
+                        this.setState({modalIsOpen: true,
+                          modalFrom: transfFrom,
+                          modalTo: transfTo,
+                          modalQuantity: transfCurrency,
+                          modalMessage: transfText,
+                          modalFee: data[0].amount,
+                          modalFeeShow: data[0].amount / 100000
+                        }); 
+                      });
+                  });
+                                     
+                }
+            });    
     });
 });
   }

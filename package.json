@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "bitsharesjs": "^1.7.1",
+    "numeral": "^2.0.6",
     "react": "^16.4.0",
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.3.2",

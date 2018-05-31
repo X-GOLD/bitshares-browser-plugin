@@ -165,12 +165,13 @@ body {
     color: #fff;
     font-size: 14.4px!important;
     border-radius: 3px!important;
-    padding: 7px;
+    padding: 10px 7px;
     text-transform: lowercase;
     font-variant: initial;
     width: 96%;
     outline: none!important;
     resize:none;
+    overflow: hidden;
 }
 .confirm-checks label {
     position: relative;
@@ -194,6 +195,7 @@ body {
 }
 .create-button {
   margin-top: 10px;
+  height: 35px;
 }
 .buttonCopy {
     background: #049cce;
@@ -311,4 +313,38 @@ div.divider {
 .button.hollow.primary:hover {
   color: #fff!important;
   background-color: #04abe2!important;
+}
+.trOverlayModal {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+.trModal {
+    position: absolute;
+    top: 100px;
+    left: 60px;
+    right: 60px;
+    bottom: 100px;
+    border: 1px solid rgb(204, 204, 204);
+    background: rgb(255, 255, 255);
+    overflow: auto;
+    border-radius: 4px;
+    outline: none;
+    padding: 20px;
+}
+.modal-page-data.status path{
+    fill: #7bd500;
+}
+.modal-page-data.status {
+  margin: auto;
+}
+.modal-page.status {
+    position: absolute;
+    top: 50%;
+    bottom: 50%;
+    right: 0;
+    left: 0;
+    margin: auto;
 }
