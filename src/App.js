@@ -52,7 +52,7 @@ render () {
    )
 }
 }
-
+/*transaction window*/
 class Main extends Component {
   constructor(props) {
     super(props);
@@ -86,6 +86,7 @@ class Main extends Component {
       // var accName = 'sdf-werg';
       // var accPass = 'P5JrEh78993Rp97AsvB5CwNR7tiEzKeb2DXxydjJDbVw3E';
     }
+    /*get accont balance*/
     var private_key = PrivateKey.fromSeed( accName + 'owner' + accPass );
     let pKey = private_key;
     Apis.instance(server, true).init_promise.then((res) => {
@@ -103,7 +104,6 @@ class Main extends Component {
                   var amountBalanceFormat = this.formatInp(amountBalance);
                   console.log(amountBalanceFormat);
                   //var amountBalanceFormat = numeral(amountBalance).format('0.00000');
-
                   amountBalanceFormat = this.styleBalance(amountBalanceFormat);
                   var amountID = balance_objects[0].asset_id;
                   _this.setState({
@@ -117,20 +117,22 @@ class Main extends Component {
         });
     });
   }
+  /*function for formatting balance as ',' (balance) and return balance*/
   styleBalance(s) {
     var d = s.indexOf('.');
     var s2 = d === -1 ? s : s.slice(0, d);
-    for (var i = s2.length - 3; i > 0; i -= 3)
+    for (var i = s2.length - 3; i > 0; i -= 3) {
       s2 = s2.slice(0, i) + ',' + s2.slice(i);
-    if (d !== -1)
+    }
+    if (d !== -1) {
       s2 += s.slice(d);
-
+    }
     return s2;
   }
+  /*function for formatting balance as 5 symbols after '.' (balance) and return balance*/
   formatInp(s) {
     var s = s.toString();
     var num;
-    console.log(s.length);
     if (s.length == 1) {
       num = '0.0000' + s;
     }
@@ -151,20 +153,15 @@ class Main extends Component {
     }
     return num;
   }
+  /*open modal with confirm transaction*/
   openModal() {
     this.setState({modalIsOpen: true});
   }
-
+  /*close modal with confirm transaction*/
   closeModal() {
     this.setState({modalIsOpen: false});
   }
-  // openModalStatus() {
-  //   this.setState({modalStatusIsOpen: true});
-  // }
 
-  // closeModalStatus() {
-  //   this.setState({modalStatusIsOpen: false});
-  // }
 /*
 <div className="fee-but">
                 <div>
@@ -237,8 +234,7 @@ class Main extends Component {
     );
   }
 
-//new modal             overlayClassName="dqqqqq"
-                   // className="aaa"
+  /*delete incorrect symbols from currency input*/
   validateCurrency = (e) => {
     var str = e.target.value,
     reg = /[\d\.]/,
@@ -250,13 +246,13 @@ class Main extends Component {
     document.querySelector("#quantity").value = str.slice(0, b)
 
   }
+  /*confirm success transaction and go to the main */
   status = (e) => {
     this.setState({modalStatusIsOpen: false});
     history.go("/main");
   }
+  /*confirm transaction and sending tr */
   transfer = (e) => {
-     //this.setState({modalStatusIsOpen: true, modalIsOpen: false}); 
-
     if (dataKey) {
       var accName = dataKey.saveAccName;
       var accPass = dataKey.savePass;
@@ -339,6 +335,7 @@ class Main extends Component {
                   });
 
   }
+  /*validate form of transaction, get fee and open window with confirm transaction*/
   validate = (e) => {
     document.querySelector('.login-error-acc').innerHTML = "";
     if (dataKey) {
@@ -452,6 +449,7 @@ class Main extends Component {
 });
   }
 }
+/*status of registration window*/
 class completeRegister extends Component {
   constructor() {
     super()
@@ -489,16 +487,19 @@ class completeRegister extends Component {
         //
     );
   }
+  /*show password of success registred account*/
   showPass = (e) => {
     this.setState({
       status: false,
       pass: dataKey.savePass
     });
   }
+  /*lets go to transaction window*/
   goMain = (e) => {
-    history.push("/main");
+      history.push("/main");
   }
 }
+/*register window*/
 class Register extends Component {
   constructor(props) {
     super(props);
@@ -537,6 +538,7 @@ class Register extends Component {
         //
     );
   }
+  /*validate data and creating account*/
   createAcc = (e) => {
     var nameAcc = document.querySelector("#accName").value;
     document.querySelector(".login-error-acc").innerHTML = "";
@@ -593,6 +595,7 @@ class Register extends Component {
     }
   }
 }
+/*auth window*/
 class Auth extends Component {
   render() {
     return (
@@ -617,9 +620,11 @@ class Auth extends Component {
     );
 
   }
+  /*go to register window*/
   register() {
     history.push("/register");
   }
+  /*validate login form and check account name and password for true result*/
   login() {
     document.querySelector(".login-error-acc.name").innerHTML = "";
     document.querySelector(".login-error-acc.pass").innerHTML = "";
