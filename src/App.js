@@ -1,3 +1,4 @@
+/*global chrome*/
 import React, { Component } from 'react';
 import {
   Router,
@@ -27,6 +28,7 @@ var keyUtils = bitsharesjs.key;
 var TransactionHelper = bitsharesjs.TransactionHelper;
 var Aes = bitsharesjs.Aes;
 var TransactionBuilder = bitsharesjs.TransactionBuilder;
+
 // var server = "wss://bitshares.openledger.info/ws";
 // var nameCurrency = 'BTS';
 // var urlRegister = 'https://faucet.bitshares.eu/api/v1/accounts';
@@ -36,22 +38,22 @@ var urlRegister = 'https://faucet.testnet.bitshares.eu/api/v1/accounts';
 
 let dataKey;
 
-
 class App extends Component {
-render () {
-   return (
-     <Router history={history}>
-       <Switch>
-         <Route exact path='/' component={Auth} />
-         <Route path='/main' component={Main} />
-         <Route path='/register' component={Register} />
-         <Route path='/completeRegister' component={completeRegister} />
-       </Switch>
-     </Router>
-     //
-   )
+  render () {
+     return (
+       <Router history={history}>
+         <Switch>
+           <Route exact path='/' component={Auth} />
+           <Route path='/main' component={Main} />
+           <Route path='/register' component={Register} />
+           <Route path='/completeRegister' component={completeRegister} />
+         </Switch>
+       </Router>
+       //
+     )
+  }
 }
-}
+
 /*transaction window*/
 class Main extends Component {
   constructor(props) {
@@ -67,25 +69,34 @@ class Main extends Component {
         modalQuantity: false,
         modalMessage: false,
         modalFee: false,
-        modalFeeShow: false
+        modalFeeShow: false,
+        storageName: ''
     };
-    // this.openModalStatus = this.openModalStatus.bind(this);
-    // this.closeModalStatus = this.closeModalStatus.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
   }
   componentDidMount() {
+    chrome.storage.local.get('storageName', (result) => {
+      var storageName = result.storageName;
+      if (storageName != undefined) {
+        this.setState({storageName: storageName});
+      }
+    });
+    this.updateBalanceValue();
+  }
+  /*update balance state, using at start and if transaction failed*/
+  updateBalanceValue = (e) => {
     var _this = this;
     if (dataKey) {
       var accName = dataKey.saveAccName;
       var accPass = dataKey.savePass;
     }
-    else {
-      var accName = 'fdfdgffdg';
-      var accPass = 'P5JtLaTvJzVKqFeE3hkV1VTJ3muw8U6RP6F8r1zdKBaza';
-      // var accName = 'sdf-werg';
-      // var accPass = 'P5JrEh78993Rp97AsvB5CwNR7tiEzKeb2DXxydjJDbVw3E';
-    }
+    // else {
+    //   var accName = 'fdfdgffdg';
+    //   var accPass = 'P5JtLaTvJzVKqFeE3hkV1VTJ3muw8U6RP6F8r1zdKBaza';
+    //   // var accName = 'sdf-werg';
+    //   // var accPass = 'P5JrEh78993Rp97AsvB5CwNR7tiEzKeb2DXxydjJDbVw3E';
+    // }
     /*get accont balance*/
     var private_key = PrivateKey.fromSeed( accName + 'owner' + accPass );
     let pKey = private_key;
@@ -100,10 +111,7 @@ class Main extends Component {
             Apis.instance().db_api().exec( "get_account_balances", [ idAcc[0][0], [idVal[0].id] ] )
                 .then( balance_objects => {
                   var amountBalance = balance_objects[0].amount;
-                  console.log(amountBalance);
                   var amountBalanceFormat = this.formatInp(amountBalance);
-                  console.log(amountBalanceFormat);
-                  //var amountBalanceFormat = numeral(amountBalance).format('0.00000');
                   amountBalanceFormat = this.styleBalance(amountBalanceFormat);
                   var amountID = balance_objects[0].asset_id;
                   _this.setState({
@@ -115,6 +123,11 @@ class Main extends Component {
           });
 
         });
+    });
+  }
+  updateInputValue = (e) => {
+    this.setState({
+      storageName: e.target.value
     });
   }
   /*function for formatting balance as ',' (balance) and return balance*/
@@ -162,14 +175,6 @@ class Main extends Component {
     this.setState({modalIsOpen: false});
   }
 
-/*
-<div className="fee-but">
-                <div>
-                  <p className="name-lable">fee</p>
-                  <input type="text" disabled id="fee" />
-                </div>
-                <button onClick={this.validate}>Send</button>
-              </div>*/
   render() {
     return (
         <div className="main-page">
@@ -178,7 +183,7 @@ class Main extends Component {
             </header>
             <div className="main-page-data">
               <p className="name-lable">From</p>
-              <input type="text" id="fromUser"  />
+              <input type="text" id="fromUser" value={this.state.storageName} onChange={this.updateInputValue}  />
               <p className="name-lable">To</p>
               <input type="text" id="toUser" />
               <p className="name-lable"><span>Quantity</span><span className="spanRight">Available: {this.state.currency} {nameCurrency}</span></p>
@@ -205,7 +210,7 @@ class Main extends Component {
                   <td></td></tr><tr><td>
                   <span>From</span></td><td>{this.state.modalFrom}</td></tr>
                   <tr><td><span>To</span></td><td>{this.state.modalTo}</td></tr>
-                  <tr><td><span>Quantity</span></td><td><span className=""><span>{this.state.modalQuantity}</span><span className="currency">{nameCurrency}</span></span></td></tr>
+                  <tr><td><span>Quantity</span></td><td><span className=""><span>{this.state.modalQuantity} </span><span className="currency">{nameCurrency}</span></span></td></tr>
                   <tr><td><span>Message</span></td><td className="memo">{this.state.modalMessage}</td></tr>
                   <tr><td><span>Fee</span></td><td><span className="facolor-fee"><span>{this.state.modalFeeShow} </span><span className="currency">{nameCurrency}</span></span></td></tr>
                 </tbody>
@@ -229,7 +234,6 @@ class Main extends Component {
               </div>
             </Modal>
         </div>  
-        
         //
     );
   }
@@ -253,87 +257,91 @@ class Main extends Component {
   }
   /*confirm transaction and sending tr */
   transfer = (e) => {
-    if (dataKey) {
-      var accName = dataKey.saveAccName;
-      var accPass = dataKey.savePass;
-    }
-    else {
-      var accName = 'fdfdgffdg';
-      var accPass = 'P5JtLaTvJzVKqFeE3hkV1VTJ3muw8U6RP6F8r1zdKBaza';
-    }
-    var private_key = PrivateKey.fromSeed( accName + 'active' + accPass );
-    let pKey = private_key;
-              var transfCurrency = this.state.modalQuantity;
-              var transfFrom = this.state.modalFrom;
-              var transfTo = this.state.modalTo;
-              var transfText = this.state.modalMessage;
-              var transfFee = this.state.modalFee;
+    Apis.instance(server, true).init_promise.then((res) => {
+        ChainStore.init().then(() => {
+          if (dataKey) {
+            var accName = dataKey.saveAccName;
+            var accPass = dataKey.savePass;
+          }
+          // else {
+          //   var accName = 'fdfdgffdg';
+          //   var accPass = 'P5JtLaTvJzVKqFeE3hkV1VTJ3muw8U6RP6F8r1zdKBaza';
+          // }
+          var private_key = PrivateKey.fromSeed( accName + 'active' + accPass );
+          let pKey = private_key;
+          var transfCurrency = this.state.modalQuantity;
+          var transfFrom = this.state.modalFrom;
+          var transfTo = this.state.modalTo;
+          var transfText = this.state.modalMessage;
+          var transfFee = this.state.modalFee;
 
-              let fromAccount = transfFrom;
-              let memoSender = fromAccount;
-              let memo = transfText;
+          let fromAccount = transfFrom;
+          let memoSender = fromAccount;
+          let memo = transfText;
 
-              let toAccount = transfTo;
+          let toAccount = transfTo;
 
-              let sendAmount = {
-                  amount: transfCurrency * 100000,
-                  asset: nameCurrency
+          let sendAmount = {
+            amount: transfCurrency * 100000,
+            asset: nameCurrency
+          }
+          Promise.all([
+            FetchChain("getAccount", fromAccount),
+            FetchChain("getAccount", toAccount),
+            FetchChain("getAccount", memoSender),
+            FetchChain("getAsset", sendAmount.asset),
+            FetchChain("getAsset", sendAmount.asset)
+          ]).then((res)=> {
+                             
+            let [fromAccount, toAccount, memoSender, sendAsset, feeAsset] = res;
+
+            let memoFromKey = memoSender.getIn(["options","memo_key"]);
+            //console.log("memo pub key:", memoFromKey);
+            let memoToKey = toAccount.getIn(["options","memo_key"]);
+            let nonce = TransactionHelper.unique_nonce_uint64();
+
+            let memo_object = {
+              from: memoFromKey,
+              to: memoToKey,
+              nonce,
+              message: Aes.encrypt_with_checksum(
+                pKey,
+                memoToKey,
+                nonce,
+                memo
+              )
+            }
+            let tr = new TransactionBuilder()
+
+            tr.add_type_operation( "transfer", {
+              fee: {
+                amount: transfFee,
+                asset_id: feeAsset.get("id")
+              },
+              from: fromAccount.get("id"),
+              to: toAccount.get("id"),
+              amount: { amount: sendAmount.amount, asset_id: sendAsset.get("id") },
+              memo: memo_object
+             } )
+
+            tr.set_required_fees().then(() => {
+              tr.add_signer(pKey, pKey.toPublicKey().toPublicKeyString());
+              //console.log("serialized transaction:", tr.serialize());
+              var status = tr.serialize();
+              if (status.operations) {
+                this.setState({modalStatusIsOpen: true, modalIsOpen: false}); 
               }
-              Promise.all([
-                      FetchChain("getAccount", fromAccount),
-                      FetchChain("getAccount", toAccount),
-                      FetchChain("getAccount", memoSender),
-                      FetchChain("getAsset", sendAmount.asset),
-                      FetchChain("getAsset", sendAmount.asset)
-                  ]).then((res)=> {
-                       
-                      let [fromAccount, toAccount, memoSender, sendAsset, feeAsset] = res;
-
-                      let memoFromKey = memoSender.getIn(["options","memo_key"]);
-                      console.log("memo pub key:", memoFromKey);
-                      let memoToKey = toAccount.getIn(["options","memo_key"]);
-                      let nonce = TransactionHelper.unique_nonce_uint64();
-
-                      let memo_object = {
-                          from: memoFromKey,
-                          to: memoToKey,
-                          nonce,
-                          message: Aes.encrypt_with_checksum(
-                              pKey,
-                              memoToKey,
-                              nonce,
-                              memo
-                          )
-                      }
-                      let tr = new TransactionBuilder()
-
-                      tr.add_type_operation( "transfer", {
-                          fee: {
-                              amount: transfFee,
-                              asset_id: feeAsset.get("id")
-                          },
-                          from: fromAccount.get("id"),
-                          to: toAccount.get("id"),
-                          amount: { amount: sendAmount.amount, asset_id: sendAsset.get("id") },
-                          memo: memo_object
-                      } )
-                      tr.set_required_fees().then(() => {
-                          tr.add_signer(pKey, pKey.toPublicKey().toPublicKeyString());
-                          console.log("serialized transaction:", tr.serialize());
-                          var status = tr.serialize();
-                          if (status.operations) {
-                            this.setState({modalStatusIsOpen: true, modalIsOpen: false}); 
-                          }
-                          else {
-                            this.setState({modalIsOpen: false});
-                            document.querySelector('.login-error-acc').innerHTML = status.message;
-
-                          }
-                          //status.code, status.message
-                          tr.broadcast();
-                      })
-                  });
-
+              else {
+                this.setState({modalIsOpen: false});
+                document.querySelector('.login-error-acc').innerHTML = status.message;
+                this.updateBalanceValue();
+              }
+              //status.code, status.message
+              tr.broadcast();
+            })
+          });
+        });
+    });
   }
   /*validate form of transaction, get fee and open window with confirm transaction*/
   validate = (e) => {
@@ -342,15 +350,15 @@ class Main extends Component {
       var accName = dataKey.saveAccName;
       var accPass = dataKey.savePass;
     }
-    else {
-      var accName = 'fdfdgffdg';
-      var accPass = 'P5JtLaTvJzVKqFeE3hkV1VTJ3muw8U6RP6F8r1zdKBaza';
-    }
+    // else {
+    //   var accName = 'fdfdgffdg';
+    //   var accPass = 'P5JtLaTvJzVKqFeE3hkV1VTJ3muw8U6RP6F8r1zdKBaza';
+    // }
     var private_key = PrivateKey.fromSeed( accName + 'active' + accPass );
     let pKey = private_key;
     Apis.instance(server, true)
       .init_promise.then((res) => {
-        console.log("connected to:", res[0].network_name, "network");
+        //console.log("connected to:", res[0].network_name, "network");
         ChainStore.init().then(() => {
           var nameTo = document.querySelector("#toUser").value;
           Apis.instance().db_api().exec( "lookup_accounts", [ nameTo, 1 ] ).then( data => {
@@ -395,58 +403,57 @@ class Main extends Component {
                     asset: nameCurrency
                 }
                 Promise.all([
-                      FetchChain("getAccount", fromAccount),
-                      FetchChain("getAccount", toAccount),
-                      FetchChain("getAccount", memoSender),
-                      FetchChain("getAsset", sendAmount.asset),
-                      FetchChain("getAsset", sendAmount.asset)
-                  ]).then((res)=> {
-                       
-                      let [fromAccount, toAccount, memoSender, sendAsset, feeAsset] = res;
+                  FetchChain("getAccount", fromAccount),
+                  FetchChain("getAccount", toAccount),
+                  FetchChain("getAccount", memoSender),
+                  FetchChain("getAsset", sendAmount.asset),
+                  FetchChain("getAsset", sendAmount.asset)
+                ]).then((res)=> {
+ 
+                  let [fromAccount, toAccount, memoSender, sendAsset, feeAsset] = res;
 
-                      let memoFromKey = memoSender.getIn(["options","memo_key"]);
+                  let memoFromKey = memoSender.getIn(["options","memo_key"]);
 
-                      let memoToKey = toAccount.getIn(["options","memo_key"]);
-                      let nonce = TransactionHelper.unique_nonce_uint64();
+                  let memoToKey = toAccount.getIn(["options","memo_key"]);
+                  let nonce = TransactionHelper.unique_nonce_uint64();
 
-                      let memo_object = {
-                          from: memoFromKey,
-                          to: memoToKey,
-                          nonce,
-                          message: Aes.encrypt_with_checksum(
-                              pKey,
-                              memoToKey,
-                              nonce,
-                              memo
-                          )
-                      }
-                      Apis.instance().db_api().exec("get_required_fees", [
-                          [[1,{
-                          fee: {
-                              amount: 0,
-                              asset_id: feeAsset.get("id")
-                          },
-                          from: fromAccount.get("id"),
-                          to: toAccount.get("id"),
-                          amount: { amount: sendAmount.amount, asset_id: sendAsset.get("id") },
-                          memo: memo_object
-                        }]],"1.3.0"
-                      ]).then( data => {
-                        this.setState({modalIsOpen: true,
-                          modalFrom: transfFrom,
-                          modalTo: transfTo,
-                          modalQuantity: transfCurrency,
-                          modalMessage: transfText,
-                          modalFee: data[0].amount,
-                          modalFeeShow: data[0].amount / 100000
-                        }); 
-                      });
-                  });
-                                     
+                  let memo_object = {
+                    from: memoFromKey,
+                    to: memoToKey,
+                    nonce,
+                    message: Aes.encrypt_with_checksum(
+                      pKey,
+                      memoToKey,
+                      nonce,
+                      memo
+                    )
+                  }
+                  Apis.instance().db_api().exec("get_required_fees", [
+                    [[1,{
+                      fee: {
+                        amount: 0,
+                        asset_id: feeAsset.get("id")
+                      },
+                      from: fromAccount.get("id"),
+                      to: toAccount.get("id"),
+                      amount: { amount: sendAmount.amount, asset_id: sendAsset.get("id") },
+                      memo: memo_object
+                    }]],"1.3.0"
+                  ]).then( data => {
+                      this.setState({modalIsOpen: true,
+                        modalFrom: transfFrom,
+                        modalTo: transfTo,
+                        modalQuantity: transfCurrency,
+                        modalMessage: transfText,
+                        modalFee: data[0].amount,
+                        modalFeeShow: data[0].amount / 100000
+                      }); 
+                    });
+                  });                    
                 }
             });    
-    });
-});
+          });
+      });
   }
 }
 /*status of registration window*/
@@ -467,8 +474,8 @@ class completeRegister extends Component {
             <h2>Create account</h2>
           </header>
           <div className="acc-creation-page-data">
-            <p>Create a backup</p>
-            <p>In case you haven't already done so, it is crucial that you take the time to write down your password now, whether it be on paper, a password manager, or somewhere else. If you lose or forget this password your account will be lost, we cannot help you get it back.</p>
+            <p className="p-one">Create a backup</p>
+            <p className="p-two">In case you haven't already done so, it is crucial that you take the time to write down your password now, whether it be on paper, a password manager, or somewhere else. If you lose or forget this password your account will be lost, we cannot help you get it back.</p>
             {status && (
               <button className="create-button name-lable" onClick={this.showPass.bind(this)}>Show my password</button>
             )}
@@ -496,9 +503,10 @@ class completeRegister extends Component {
   }
   /*lets go to transaction window*/
   goMain = (e) => {
-      history.push("/main");
+    history.push("/main");
   }
 }
+
 /*register window*/
 class Register extends Component {
   constructor(props) {
@@ -534,7 +542,6 @@ class Register extends Component {
             <button className="create-button name-lable" onClick={this.createAcc}>Create account</button>
           </div>
         </div>
-        
         //
     );
   }
@@ -582,6 +589,7 @@ class Register extends Component {
                   .then((responseJson) => {
                     console.log('all is success');
                     dataKey = { saveAccName: nameAcc, savePass: this.state.pass};
+                    chrome.storage.local.set({'storageName': nameAcc});
                     history.push("/completeRegister");
                   })
                   .catch((error) => {
@@ -597,6 +605,20 @@ class Register extends Component {
 }
 /*auth window*/
 class Auth extends Component {
+  constructor() {
+    super()
+    this.state = {
+     storageName: ''
+    }
+  }
+  componentDidMount() {
+    chrome.storage.local.get('storageName', (result) => {
+      var storageName = result.storageName;
+      if (storageName != undefined) {
+        this.setState({storageName: storageName});
+      }
+    });
+  }
   render() {
     return (
         <div className="log-page">
@@ -606,19 +628,25 @@ class Auth extends Component {
           </header>
           <div className="login-page-data">
             <p className="name-lable">Account name</p>
-            <input type="text" id="userName" placeholder="account name" />
+            <input type="text" id="userName" placeholder="account name" value={this.state.storageName} onChange={this.updateInputValue} />
             <div className="login-error-acc name"></div>
             <p className="name-lable" placeholder="password">password</p>
             <input type="password" id="userPassword" />
             <div className="login-error-acc pass"></div>
-            <button className="login-button name-lable" onClick={this.login}>Login</button>
-            <button className="login-button name-lable" onClick={this.register}>Register</button>
+            <div className="loginOrRegister">
+              <button className="login-button name-lable" onClick={this.login}>Login</button>
+              <button className="login-button name-lable" onClick={this.register}>Register</button>
+            </div>
           </div>
         </div>
-
-//
+      //
     );
+  }
 
+  updateInputValue = (e) => {
+    this.setState({
+      storageName: e.target.value
+    });
   }
   /*go to register window*/
   register() {
@@ -638,38 +666,33 @@ class Auth extends Component {
       document.querySelector(".login-error-acc.pass").innerHTML = "Password must have at least 12 characters";
     }
     if (document.querySelector("#userName").value != "" && document.querySelector("#userPassword").value != "" && document.querySelector("#userPassword").value.length > 11) {
-      // var accName = "test-ei";
-      // var accPass = "P5JussgYdgVoP8YWC3kFwcztcXt878tqYiVv4YKuGVd7v";
-      Apis.instance(
-            server,
-            true
-        ).init_promise.then(function(result) {
-            ChainStore.init().then(() => {
 
-      var accName = document.querySelector("#userName").value;
-      var accPass = document.querySelector("#userPassword").value;
-      var keys = Login.generateKeys(accName, accPass, ["active", "owner", "memo"], nameCurrency);
-      //console.log(keys);
-      Apis.instance().db_api().exec("get_account_by_name", [accName]).then(res => {
-        console.log(res);
-          if (res && res.options.memo_key) {
-            var accKeys = res.options.memo_key;
-            var genKeys = keys.pubKeys.active;
-            if (accKeys == genKeys) {
-              // var private_key = PrivateKey.fromSeed(accName + 'owner' + accPass);
-              // var sendKey = private_key.toWif();
-              dataKey = { saveAccName: accName, savePass: accPass};
-              history.push("/main");
+    Apis.instance(
+      server, true).init_promise.then(function(result) {
+        ChainStore.init().then(() => {
+
+        var accName = document.querySelector("#userName").value;
+        var accPass = document.querySelector("#userPassword").value;
+        var keys = Login.generateKeys(accName, accPass, ["active", "owner", "memo"], nameCurrency);
+        Apis.instance().db_api().exec("get_account_by_name", [accName]).then(res => {
+            if (res && res.options.memo_key) {
+              var accKeys = res.options.memo_key;
+              var genKeys = keys.pubKeys.memo;
+              if (accKeys == genKeys || accKeys == keys.pubKeys.active) {
+                chrome.storage.local.set({'storageName': accName});
+                dataKey = { saveAccName: accName, savePass: accPass};
+                history.push("/main");
+              }
+              else {
+                 document.querySelector(".login-error-acc.pass").innerHTML = "Incorrect login or password";
+              }
             }
             else {
-               document.querySelector(".login-error-acc.pass").innerHTML = "Incorrect login or password";
+              document.querySelector(".login-error-acc.pass").innerHTML = "Incorrect login or password";
             }
-          }
-          else {
-            document.querySelector(".login-error-acc.pass").innerHTML = "Incorrect login or password";
-          }
+          });
         });
-    });})
+      })
     }
   };
 }

@@ -176,7 +176,7 @@ body {
 .confirm-checks label {
     position: relative;
     display: block;
-    font-size: .9rem;
+    font-size: 12px;
 }
 .confirm-checks.first {
   margin-top: 20px;
@@ -257,6 +257,8 @@ div.divider {
 }
 .acc-creation-page-data p.warning {
   color: #fcab53;
+  font-size: 15px;
+  padding-bottom: 10px;
 }
 .showP, .showP p {
   text-align: center;
@@ -338,13 +340,42 @@ div.divider {
     fill: #7bd500;
 }
 .modal-page-data.status {
-  margin: auto;
+    margin: auto;
+    position: absolute;
+    width: 80%;
+    transform: translate(0, 50%);
 }
 .modal-page.status {
     position: absolute;
-    top: 50%;
-    bottom: 50%;
     right: 0;
     left: 0;
     margin: auto;
+}
+.modal-page.status p:first-child {
+  font-size: 16px;
+}
+.modal-page.status p:last-child {
+  font-size: 14px;
+}
+.modal-page-data.status {
+  margin-top: 20px;
+}
+.register-page header h2 {
+  margin-top: 5px;
+}
+.p-one {
+  font-size: 16px;
+}
+.p-two { 
+  font-size: 14px;
+}
+.loginOrRegister button {
+  width: 45%;
+  height: 35px;
+  display: inline-block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.loginOrRegister button:last-child {
+    float: right;
 }
