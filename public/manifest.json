@@ -16,6 +16,6 @@
         "128": "images/icon128.png"
     },
     "permissions": [
-        "webRequest", "webRequestBlocking", "<all_urls>", "storage", "tabs", "storage", "activeTab"
+        "webRequest", "webRequestBlocking", "<all_urls>", "storage", "tabs", "activeTab"
     ]
 }
