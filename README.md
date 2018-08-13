@@ -1,3 +1,12 @@
+## Browser Plugin for BitShares
+
+**WARNING**: This code base is a pilot project and is unreviwed and not
+maintained!
+
+The purpose of this plugin was an in-browser app for simple asset
+transfers.
+
+## Installation
 
 1) for install package(node modules)
 
